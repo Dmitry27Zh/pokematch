@@ -26,7 +26,7 @@ const initPokematch = () => {
   }
   let isPaused = false
   let firstPick
-  let matches = 0
+  let matchesCount = 0
   const board = document.querySelector('#pokematch-board')
 
   if (!board) {
@@ -78,34 +78,34 @@ const initPokematch = () => {
     }
 
     rotateParts([front, back])
-    isPaused = true
 
     if (!firstPick) {
       firstPick = pokeCard
-      isPaused = false
-    } else {
-      const firstPickName = firstPick.dataset.pokename
-      const secondPickName = pokeCard.dataset.pokename
-
-      if (firstPickName !== secondPickName) {
-        const [firstPickFront, firstPickBack] = getFrontAndBackFromCard(firstPick)
-
-        setTimeout(() => {
-          rotateParts([front, back, firstPickFront, firstPickBack])
-          firstPick = null
-          isPaused = false
-        }, 500)
-      } else {
-        matches++
-        firstPick = null
-        isPaused = false
-      }
+      return
     }
 
-    if (matches === 8) {
+    isPaused = true
+    const firstPickName = firstPick.dataset.pokename
+    const secondPickName = pokeCard.dataset.pokename
+
+    if (firstPickName === secondPickName) {
+      matchesCount++
+      firstPick = null
+      isPaused = false
+    } else {
+      const [firstPickFront, firstPickBack] = getFrontAndBackFromCard(firstPick)
+
+      setTimeout(() => {
+        rotateParts([front, back, firstPickFront, firstPickBack])
+        firstPick = null
+        isPaused = false
+      }, 500)
+    }
+
+    if (matchesCount === 8) {
       setTimeout(() => {
         alert('Win!')
-        resetGame
+        resetGame()
       }, 1000)
     }
   }
@@ -123,7 +123,7 @@ const initPokematch = () => {
     board.innerHTML = ''
     isPaused = true
     firstPick = null
-    matches = 0
+    matchesCount = 0
 
     setTimeout(async () => {
       const pokemon = await loadPokemon()
